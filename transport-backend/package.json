@@ -1,0 +1,17 @@
+{
+  "name": "transport-backend",
+  "version": "1.0.0",
+  "description": "backend for the public transport crowding prediction system ",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "author": "Yash Tripathi",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "pg": "^8.20.0"
+  }
+}
