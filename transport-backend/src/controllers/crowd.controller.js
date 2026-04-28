@@ -1,4 +1,38 @@
 const pool = require('../db/db');
+const axios = require('axios');
+
+const predictCrowd = async (req, res) => {
+    try {
+        console.log("REQ BODY:", req.body);  // 👈 must print
+
+        const response = await axios.post(
+            'http://127.0.0.1:9000/predict',
+            req.body,
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                timeout: 5000
+            }
+        );
+
+        res.json(response.data);
+
+    } catch (error) {
+        console.error("FULL ERROR:", error.message);
+
+        if (error.response) {
+            console.error("FLASK ERROR:", error.response.data);
+        }
+
+        res.status(500).json({
+            message: "Prediction failed",
+            error: error.response?.data || error.message
+        });
+    }
+};
+
+
 
 const getCrowdData  = async (req, res) => {
     try {
@@ -42,5 +76,6 @@ const addCrowdData = async (req,res) => {
 
 module.exports = {
     getCrowdData,
-    addCrowdData
+    addCrowdData,
+    predictCrowd
 }

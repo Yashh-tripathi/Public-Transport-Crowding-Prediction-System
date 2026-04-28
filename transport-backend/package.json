@@ -9,6 +9,7 @@
   "author": "Yash Tripathi",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.15.2",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
