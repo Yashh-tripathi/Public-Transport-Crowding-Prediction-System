@@ -4,7 +4,7 @@ from sklearn.ensemble import RandomForestRegressor
 import psycopg2
 
 app = Flask(__name__)
-
+model = None
 # helpers
 def convert_day(day):
     days = {
@@ -22,16 +22,19 @@ def convert_time(t):
     t = str(t).strip().upper()
 
     try:
-        if "AM" in t or "PM" in t:
-            num = int(t.split("A")[0].split("P")[0])
-            if "PM" in t and num != 12:
-                num += 12
-            return num
+        is_pm = "PM" in t
+
+        t = t.replace("AM", "").replace("PM", "")
 
         if ":" in t:
-            return int(t.split(":")[0])
+            num = int(t.split(":")[0])
+        else:
+            num = int(t)
 
-        return int(t)
+        if is_pm and num != 12:
+            num += 12
+
+        return num
 
     except Exception as e:
         print("Time conversion error:", t, e)
@@ -61,27 +64,47 @@ def load_data():
     df['time'] = df['time_slot'].apply(convert_time)
     df['day_num'] = df['day'].apply(convert_day)
     df['weather_num'] = df['weather'].apply(convert_weather)
+    df["is_weekend"] = df["day"].apply(lambda d: 1 if d in ["Saturday","Sunday"] else 0)
     
-    X = df[["route", "time", "day_num", "weather_num"]]
+    X = df[["route", "time", "day_num", "weather_num","is_weekend"]]
     y = df["passenger_count"]
     
     return X,y
 
 # training the model
-X, y = load_data()
-model = RandomForestRegressor()
-model.fit(X,y)
-print("Model trained over the database data")
+# X, y = load_data()
+# model = RandomForestRegressor()
+# model.fit(X,y)
+# print("Model trained over the database data")
+
+# ---------- TRAIN FUNCTION ----------
+def train_model():
+    global model
+    X, y = load_data()
+    model = RandomForestRegressor()
+    model.fit(X, y)
+    print("✅ Model retrained on latest DB data")
+    
+    
+@app.route("/retrain", methods=["POST"])
+def retrain():
+    train_model()
+    return jsonify({"message": "Model retrained"})
+
 
 @app.route("/predict", methods=['POST'])
 def predict():
+    global model
+    if model is None:
+        return jsonify({"error": "Model not trained yet"}), 500
     data = request.json
     
     input_df = pd.DataFrame([{
         "route": int(data["route_name"]),
         "time": convert_time(data["time_slot"]),
         "day_num": convert_day(data["day"]),
-        "weather_num": convert_weather(data["weather"])
+        "weather_num": convert_weather(data["weather"]),
+        "is_weekend": 1 if data["day"] in ["Saturday","Sunday"] else 0
     }])
     
     pred = model.predict(input_df)[0]
@@ -93,4 +116,5 @@ def predict():
 
 
 if __name__ == "__main__":
+    train_model()
     app.run(port=9000)

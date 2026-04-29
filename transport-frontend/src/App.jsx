@@ -2,11 +2,13 @@ import { useState } from "react"
 import CrowdForm from "./components/CrowdForm"
 import CrowdTable from "./components/CrowdTable"
 import PredictHistory from "./components/PredictHistory"
+import AnalysisPage from "./components/AnalysisPage"
 
 const NAV = [
   { id: "log",     label: "Log Data",    icon: "⊕", desc: "Record crowd observations" },
   { id: "data",    label: "Crowd Data",  icon: "⊞", desc: "Browse logged entries" },
   { id: "history", label: "Predictions", icon: "◈", desc: "View prediction history" },
+  { id: "analysis", label: "Analysis", icon: "⇪", desc: "Analysis report" },
 ]
 
 export default function App() {
@@ -109,6 +111,7 @@ export default function App() {
         {active === "log"     && <CrowdForm refresh={triggerRefresh} />}
         {active === "data"    && <CrowdTable refresh={refresh} />}
         {active === "history" && <PredictHistory />}
+        {active === "analysis" && <AnalysisPage/>}
       </main>
 
       {/* ── Footer ── */}

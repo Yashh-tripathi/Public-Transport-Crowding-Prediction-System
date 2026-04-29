@@ -3,7 +3,7 @@ const axios = require('axios');
 
 const predictCrowd = async (req, res) => {
     try {
-        // console.log("REQ BODY:", req.body);  // 👈 must print
+        // console.log("REQ BODY:", req.body); 
 
         const response = await axios.post(
             'http://127.0.0.1:9000/predict',
@@ -92,6 +92,8 @@ const addCrowdData = async (req,res) => {
             `INSERT INTO crowd_data (route_name, day, weather, passenger_count, time_slot) VALUES ($1,$3,$4,$5,$2) RETURNING *`,
             [route_name, time_slot, day, weather, passenger_count]
         )
+
+        await axios.post("http://127.0.0.1:9000/retrain");
 
         res.status(201).json({
             message: "Data inserted successfully ✅",
