@@ -3,7 +3,7 @@ const axios = require('axios');
 
 const predictCrowd = async (req, res) => {
     try {
-        console.log("REQ BODY:", req.body);  // 👈 must print
+        // console.log("REQ BODY:", req.body);  // 👈 must print
 
         const response = await axios.post(
             'http://127.0.0.1:9000/predict',
