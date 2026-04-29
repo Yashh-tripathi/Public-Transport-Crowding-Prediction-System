@@ -96,7 +96,7 @@ const addCrowdData = async (req,res) => {
         await axios.post("http://127.0.0.1:9000/retrain");
 
         res.status(201).json({
-            message: "Data inserted successfully ✅",
+            message: "Data inserted successfully",
             data: result.rows[0]
         });
     } catch (error) {

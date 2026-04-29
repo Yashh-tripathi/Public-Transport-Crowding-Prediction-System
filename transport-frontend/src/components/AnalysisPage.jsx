@@ -1,8 +1,5 @@
 import { useEffect, useRef, useState } from "react"
 import { Bar, Line, Doughnut } from "react-chartjs-2"
-// import L from "leaflet"
-// import "leaflet/dist/leaflet.css"
-// import "leaflet.heat"
 import API from "../api/baseApi"
 import {
   Chart as ChartJS, CategoryScale, LinearScale, BarElement,
