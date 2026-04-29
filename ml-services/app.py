@@ -76,14 +76,12 @@ def load_data():
 # model = RandomForestRegressor()
 # model.fit(X,y)
 # print("Model trained over the database data")
-
-# ---------- TRAIN FUNCTION ----------
 def train_model():
     global model
     X, y = load_data()
     model = RandomForestRegressor()
     model.fit(X, y)
-    print("✅ Model retrained on latest DB data")
+    print("Model retrained on latest DB data")
     
     
 @app.route("/retrain", methods=["POST"])
