@@ -61,7 +61,8 @@ const getPredictions = async (req, res) => {
 
 const getCrowdData  = async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM crowd_data');
+        
+        const result = await pool.query('SELECT * FROM crowd_data ORDER BY id DESC LIMIT 10');
         res.json(result.rows);
     } catch (error) {
         console.error(error);
@@ -72,6 +73,9 @@ const getCrowdData  = async (req, res) => {
 
 const addCrowdData = async (req,res) => {
     try {
+        if (req.headers.authorization !== "admin") {
+            return res.status(403).send("Unauthorized");
+        }
         const {
             route_name,
             time_slot,

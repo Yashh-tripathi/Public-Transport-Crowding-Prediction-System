@@ -23,15 +23,41 @@ const inputClass =
   'w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 shadow-sm transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 hover:border-slate-300';
 
 export default function CrowdForm({ refresh }) {
-  const [mode, setMode] = useState('predict')
+  const [mode, setMode] = useState("predict");
+  const [showLogin, setShowLogin] = useState(false);
+  const [adminAuth, setAdminAuth] = useState(false);
   const [prediction, setPrediction] = useState(null);
   const [loading, setLoading]       = useState({ predict: false, submit: false });
   const [submitted, setSubmitted]   = useState(false);
+  const [loginData, setLoginData] = useState({
+    username: "",
+    password: "",
+    pin: ""
+  });
+  
+  const [loginError, setLoginError] = useState("");
 
   const [form, setForm] = useState({
     route_name: '', time_slot: '', day: '', weather: '', passenger_count: '',
   });
 
+  const handleLogMode = () => {
+    setShowLogin(true);
+  };
+  const handleLogin = async () => {
+    try {
+      const res = await API.post("/admin-login", loginData);
+  
+      if (res.data.success) {
+        setAdminAuth(true);
+        setMode("log");
+        setShowLogin(false);
+        setLoginError("");
+      }
+    } catch (err) {
+      setLoginError("Invalid credentials ❌");
+    }
+  };
   const handleChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
@@ -56,7 +82,11 @@ export default function CrowdForm({ refresh }) {
     e.preventDefault();
     setLoading((l) => ({ ...l, submit: true }));
     try {
-      await API.post('/add-crowd', form);
+      await API.post('/add-crowd', form, {
+        headers: {
+            Authorization: "admin"
+          }
+      });
       refresh();
       setForm({ route_name: '', time_slot: '', day: '', weather: '', passenger_count: '' });
       setPrediction(null);
@@ -96,7 +126,7 @@ export default function CrowdForm({ refresh }) {
             </button>
 
             <button
-                onClick={() => setMode("log")}
+                onClick={handleLogMode}
                 className={mode === "log" ? "bg-indigo-600 text-white px-3 py-1 rounded" : "px-3 py-1"}
             >
                 Log Data
@@ -251,6 +281,105 @@ export default function CrowdForm({ refresh }) {
           </div>
         )}
       </div>
+      {showLogin && (
+  <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+
+    <div className="w-full max-w-sm bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+
+      {/* Header */}
+      <div className="px-6 pt-6 pb-4 border-b border-slate-100">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="w-8 h-8 flex items-center justify-center rounded-lg bg-indigo-600 text-white">⬡</span>
+          <span className="text-xs font-semibold tracking-widest text-indigo-600 uppercase">
+            CrowdSense
+          </span>
+        </div>
+        <h2 className="text-xl font-bold text-slate-900">Admin Access</h2>
+        <p className="text-sm text-slate-500 mt-0.5">
+          Enter credentials to log crowd data
+        </p>
+      </div>
+
+      {/* Form */}
+      <div className="px-6 py-5 space-y-4">
+
+        {/* Username */}
+        <div>
+          <label className="text-xs font-medium text-slate-600 mb-1 block">
+            Username
+          </label>
+          <input
+            type="text"
+            placeholder="Enter username"
+            onChange={(e) =>
+              setLoginData({ ...loginData, username: e.target.value })
+            }
+            className="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none"
+          />
+        </div>
+
+        {/* Password */}
+        <div>
+          <label className="text-xs font-medium text-slate-600 mb-1 block">
+            Password
+          </label>
+          <input
+            type="password"
+            placeholder="Enter password"
+            onChange={(e) =>
+              setLoginData({ ...loginData, password: e.target.value })
+            }
+            className="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none"
+          />
+        </div>
+
+        {/* PIN */}
+        <div>
+          <label className="text-xs font-medium text-slate-600 mb-1 block">
+            Security PIN
+          </label>
+          <input
+            type="password"
+            placeholder="4-digit PIN"
+            onChange={(e) =>
+              setLoginData({ ...loginData, pin: e.target.value })
+            }
+            className="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 outline-none"
+          />
+        </div>
+
+        {/* Error */}
+        {loginError && (
+          <p className="text-sm text-red-500 bg-red-50 border border-red-200 px-3 py-2 rounded-lg">
+            {loginError}
+          </p>
+        )}
+      </div>
+
+      {/* Actions */}
+      <div className="px-6 py-4 bg-slate-50 flex gap-3">
+
+        <button
+          onClick={handleLogin}
+          className="flex-1 rounded-lg bg-indigo-600 text-white text-sm font-semibold py-2.5 hover:bg-indigo-700 transition active:scale-[0.98]"
+        >
+          🔐 Login
+        </button>
+
+        <button
+          onClick={() => {
+            setShowLogin(false);
+            setMode("predict");
+          }}
+          className="flex-1 rounded-lg border border-slate-300 text-slate-700 text-sm font-semibold py-2.5 hover:bg-slate-100 transition active:scale-[0.98]"
+        >
+          Back
+        </button>
+
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }
