@@ -3,6 +3,11 @@ import API from '../api/baseApi';
 
 function CrowdForm({ refresh }) {
 
+    const [prediction, setPrediction] = useState(null);
+
+
+
+
   const [form, setForm] = useState({
     route_name: "",
     time_slot: "",
@@ -18,6 +23,13 @@ function CrowdForm({ refresh }) {
     });
   };
 
+  const getCrowdLevel =  (value) => {
+    if( value < 80) return 'Low';
+    if( value < 120) return 'Moderate';
+    else return 'High';
+  }
+
+
   // 🔥 Predict Crowd
   const handlePredict = async () => {
     try {
@@ -32,7 +44,7 @@ function CrowdForm({ refresh }) {
 
       const res = await API.post("/predict", cleanData);
 
-      alert(`Predicted Crowd: ${res.data.predicted_passengers}`);
+      setPrediction(res.data.predicted_passengers);
 
     } catch (error) {
       console.error("Prediction Error:", error.response?.data || error.message);
@@ -63,6 +75,7 @@ function CrowdForm({ refresh }) {
   };
 
   return (
+    <div>
     <form onSubmit={handleSubmit}>
 
       <input
@@ -107,6 +120,15 @@ function CrowdForm({ refresh }) {
       </button>
 
     </form>
+    {
+        prediction && (
+            <div>
+                <h1>Predicted crowd: {prediction}</h1>
+                <h2>Level: {getCrowdLevel(prediction)}</h2>
+            </div>
+        )
+    }
+    </div>
   );
 }
 

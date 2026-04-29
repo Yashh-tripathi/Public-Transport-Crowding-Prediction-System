@@ -16,6 +16,19 @@ const predictCrowd = async (req, res) => {
             }
         );
 
+        await pool.query(
+            `INSERT INTO predictions 
+             (route_name, time_slot, day, weather, predicted_passengers)
+             VALUES ($1,$2,$3,$4,$5)`,
+            [
+                req.body.route_name,
+                req.body.time_slot,
+                req.body.day,
+                req.body.weather,
+                response.data.predicted_passengers
+            ]
+        );
+
         res.json(response.data);
 
     } catch (error) {
@@ -29,6 +42,18 @@ const predictCrowd = async (req, res) => {
             message: "Prediction failed",
             error: error.response?.data || error.message
         });
+    }
+};
+
+const getPredictions = async (req, res) => {
+    try {
+        const result = await pool.query(
+            'SELECT * FROM predictions ORDER BY created_at DESC'
+        );
+        res.json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error fetching predictions");
     }
 };
 
@@ -77,5 +102,6 @@ const addCrowdData = async (req,res) => {
 module.exports = {
     getCrowdData,
     addCrowdData,
-    predictCrowd
+    predictCrowd,
+    getPredictions
 }
