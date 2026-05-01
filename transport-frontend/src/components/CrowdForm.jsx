@@ -271,7 +271,7 @@ export default function CrowdForm({ refresh }) {
             </div>
 
             {/* Meta row */}
-            <div className="px-6 py-3 border-t border-current/10 bg-black/[0.02] flex gap-4 text-xs text-slate-500">
+            <div className="px-6 py-3 border-t border-current/10 bg-black/2 flex gap-4 text-xs text-slate-500">
               <span>Route: <strong className="text-slate-700">{form.route_name}</strong></span>
               <span>·</span>
               <span>{form.day} · {form.time_slot.toUpperCase()}</span>

@@ -118,7 +118,7 @@ function PredictHistory() {
           {/* Toolbar */}
           <div className="px-5 py-3.5 border-b border-slate-100 flex flex-wrap items-center gap-3">
             {/* Search */}
-            <div className="relative flex-1 min-w-[180px] max-w-xs">
+            <div className="relative flex-1 min-w-45 max-w-xs">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">⌕</span>
               <input
                 value={search}
