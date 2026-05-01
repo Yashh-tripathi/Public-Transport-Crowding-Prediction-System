@@ -56,3 +56,16 @@ jobs:
         run: |
           cd ml-services
           python -c "print('ML OK')"
+    # ---------- Start ML Service ----------
+      - name: Start Flask Server
+        run: |
+          cd ml-services
+          nohup python app.py &
+          sleep 5
+
+      # ---------- Test ML API ----------
+      - name: Test Prediction API
+        run: |
+          curl -X POST http://127.0.0.1:9000/predict \
+          -H "Content-Type: application/json" \
+          -d '{"route_name":"101","time_slot":"8AM","day":"Monday","weather":"clear"}'
